@@ -102,13 +102,26 @@ export default function Terminal({ content }: TerminalProps) {
   }
 
   function runCommand(id: TabId) {
-    setActiveTab((current) => (current === id ? null : id));
+    // toggle: clicar na aba já ativa fecha o conteúdo
+    const next = activeTab === id ? null : id;
+    setActiveTab(next);
+
+    // só rola a tela quando uma aba está sendo ABERTA — fechar não precisa de scroll
+    if (next) {
+      // pequeno delay pra garantir que o React já renderizou a #content-section
+      setTimeout(() => {
+        document.getElementById("content-section")?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 100);
+    }
   }
 
   return (
     <section className="mx-auto max-w-content px-6 sm:px-10 lg:px-8">
       {/* janela de terminal */}
-      <div className="mx-auto flex min-h-[450px] w-full max-w-4xl flex-col rounded-lg border border-zinc-800 bg-zinc-950 shadow-2xl shadow-black/40">
+      <div className="mx-auto flex h-auto w-full max-w-4xl flex-col rounded-lg border border-zinc-800 bg-zinc-950 shadow-2xl shadow-black/40">
         {/* cabeçalho estilo macOS */}
         <div className="flex items-center border-b border-zinc-800 bg-zinc-900/60 px-4 py-3">
           <div className="flex gap-2">
@@ -127,7 +140,7 @@ export default function Terminal({ content }: TerminalProps) {
         <div
           ref={bodyRef}
           onClick={() => inputRef.current?.focus()}
-          className="flex-1 space-y-1.5 overflow-y-auto p-5 font-mono text-sm leading-relaxed sm:p-6"
+          className="flex-1 space-y-1.5 overflow-y-auto p-5 pb-6 font-mono text-sm leading-relaxed sm:p-6 sm:pb-8"
         >
           {history.map((line) => (
             <motion.div
@@ -165,7 +178,7 @@ export default function Terminal({ content }: TerminalProps) {
               transition={{ duration: 0.3 }}
               role="tablist"
               aria-label="Navegação do portfólio"
-              className="mt-3 flex flex-col gap-2"
+              className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3"
             >
               {COMMANDS.map((cmd) => {
                 const isActive = activeTab === cmd.id;
@@ -176,15 +189,27 @@ export default function Terminal({ content }: TerminalProps) {
                     role="tab"
                     aria-selected={isActive}
                     onClick={() => runCommand(cmd.id)}
-                    className={`text-left transition-colors duration-150 ${
+                    className={`group flex items-center justify-between rounded-md border px-4 py-3 text-left font-mono transition-all duration-200 ${
                       isActive
-                        ? "text-emerald-400"
-                        : "text-zinc-400 hover:text-emerald-400"
+                        ? "border-emerald-500/70 bg-white/5 text-emerald-400 shadow-[0_0_14px_-4px_rgba(16,185,129,0.5)]"
+                        : "border-zinc-800 bg-zinc-900/50 text-zinc-400 hover:border-emerald-500/70 hover:bg-white/5 hover:text-emerald-400"
                     }`}
                   >
-                    [{cmd.index}] {cmd.label}
+                    <span>
+                      <span
+                        className={
+                          isActive
+                            ? "text-emerald-500"
+                            : "text-zinc-600 transition-colors duration-200 group-hover:text-emerald-500"
+                        }
+                      >
+                        [{cmd.index}]
+                      </span>{" "}
+                      {cmd.label}
+                    </span>
+
                     {isActive && (
-                      <span aria-hidden="true" className="ml-2 animate-pulse">
+                      <span aria-hidden="true" className="animate-pulse text-emerald-400">
                         _
                       </span>
                     )}
@@ -200,10 +225,11 @@ export default function Terminal({ content }: TerminalProps) {
       {isUnlocked && activeTab && (
         <motion.div
           key={activeTab}
+          id="content-section"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25, ease: "easeOut" }}
-          className="mt-10"
+          className="mt-10 scroll-mt-6"
         >
           {content[activeTab]}
         </motion.div>

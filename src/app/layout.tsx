@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import InteractiveBackground from "@/components/InteractiveBackground";
+import MouseSpotlight from "@/components/MouseSpotlight";
 import "./globals.css";
 
 const inter = Inter({
@@ -29,6 +30,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={`${inter.variable} ${jetbrainsMono.variable}`}>
       <body className="bg-zinc-950 font-sans text-zinc-300 antialiased">
+        <MouseSpotlight />
         <InteractiveBackground />
         <div className="relative z-10">{children}</div>
       </body>
