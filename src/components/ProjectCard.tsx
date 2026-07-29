@@ -1,9 +1,14 @@
+"use client";
+
+import { motion } from "framer-motion";
+
 export interface Project {
   name: string;
   description: string;
   stack: string[];
   status: "shipped" | "wip" | "hackathon-winner";
-  link?: string;
+  github?: string;
+  demo?: string;
 }
 
 const STATUS_LABEL: Record<Project["status"], string> = {
@@ -12,53 +17,79 @@ const STATUS_LABEL: Record<Project["status"], string> = {
   "hackathon-winner": "Vencedor de hackathon",
 };
 
+// blue-500 reaproveita a mesma cor já usada em About.tsx para referências
+// de infra/Azure — mantém o card na paleta que o resto do site já fala.
 const STATUS_DOT: Record<Project["status"], string> = {
   shipped: "bg-blue-500",
   wip: "bg-zinc-600",
   "hackathon-winner": "bg-emerald-400",
 };
 
-export default function ProjectCard({ project }: { project: Project }) {
-  const { name, description, stack, status, link } = project;
+export default function ProjectCard({
+  project,
+  index = 0,
+}: {
+  project: Project;
+  index?: number;
+}) {
+  const { name, description, stack, status, github, demo } = project;
 
   return (
-    <div className="group flex h-full flex-col rounded-lg border border-zinc-800 bg-zinc-900/20 p-6 transition-colors duration-200 hover:border-zinc-700 hover:bg-zinc-900/40">
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, delay: index * 0.06, ease: "easeOut" }}
+      className="flex h-full flex-col rounded-md border border-zinc-800 bg-zinc-900/40 p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-500/50 hover:bg-zinc-900/60 hover:shadow-[0_0_24px_-10px_rgba(52,211,153,0.35)] sm:p-6"
+    >
       <div className="flex items-center gap-2">
         <span className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[status]}`} />
-        <span className="font-mono text-xs text-zinc-500">
+        <span className="font-mono text-[11px] uppercase tracking-wider text-zinc-500">
           {STATUS_LABEL[status]}
         </span>
       </div>
 
-      <h3 className="mt-4 text-lg font-semibold text-zinc-50">{name}</h3>
+      <h3 className="mt-3 text-base font-semibold text-zinc-50 sm:text-lg">
+        {name}
+      </h3>
       <p className="mt-2 flex-1 text-sm leading-relaxed text-zinc-400">
         {description}
       </p>
 
-      <div className="mt-6 flex flex-wrap gap-2">
-        {stack.map((s) => (
+      <div className="mt-5 flex flex-wrap gap-1.5">
+        {stack.map((tech) => (
           <span
-            key={s}
-            className="rounded-md border border-zinc-800 px-2.5 py-1 font-mono text-xs text-zinc-400"
+            key={tech}
+            className="rounded border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 font-mono text-[11px] text-emerald-400"
           >
-            {s}
+            {tech}
           </span>
         ))}
       </div>
 
-      {link && (
-        <a
-          href={link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-emerald-400 transition-colors hover:text-emerald-300"
-        >
-          Ver repositório
-          <span aria-hidden className="transition-transform group-hover:translate-x-0.5">
-            →
-          </span>
-        </a>
+      {(github || demo) && (
+        <div className="mt-5 flex gap-4 border-t border-zinc-800/70 pt-4 font-mono text-xs">
+          {github && (
+            <a
+              href={github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-zinc-500 transition-colors hover:text-emerald-400"
+            >
+              [ GitHub ]
+            </a>
+          )}
+          {demo && (
+            <a
+              href={demo}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-zinc-500 transition-colors hover:text-emerald-400"
+            >
+              [ Deploy ]
+            </a>
+          )}
+        </div>
       )}
-    </div>
+    </motion.div>
   );
 }
