@@ -4,13 +4,13 @@ import Stack from "@/components/Stack";
 import ProjectGrid from "@/components/ProjectGrid";
 import HackathonTimeline from "@/components/HackathonTimeline";
 import Footer from "@/components/Footer";
-import TerminalTabs from "@/components/TerminalTabs";
+import Terminal from "@/components/Terminal";
 
 export default function Home() {
   return (
     <main className="min-h-screen">
       <Hero />
-      <TerminalTabs
+      <Terminal
         content={{
           sobre: (
             <>
