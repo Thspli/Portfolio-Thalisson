@@ -1,29 +1,22 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 
 export interface Project {
-  name: string;
+  slug: string;
+  title: string;
+  /** Ex.: "Desafio de Ideias · Hackathon" ou "Projeto de TCC" */
+  context: string;
+  /** "O Projeto" */
   description: string;
-  stack: string[];
-  status: "shipped" | "wip" | "hackathon-winner";
-  github?: string;
-  demo?: string;
+  /** "Meu papel" — opcional: nem todo projeto tem essa frase definida ainda */
+  role?: string;
+  tech: string[];
+  image: string;
+  /** Se presente, aparece como link dentro do overlay expandido */
+  href?: string;
 }
-
-const STATUS_LABEL: Record<Project["status"], string> = {
-  shipped: "Em produção",
-  wip: "Em desenvolvimento",
-  "hackathon-winner": "Vencedor de hackathon",
-};
-
-// blue-500 reaproveita a mesma cor já usada em About.tsx para referências
-// de infra/Azure — mantém o card na paleta que o resto do site já fala.
-const STATUS_DOT: Record<Project["status"], string> = {
-  shipped: "bg-blue-500",
-  wip: "bg-zinc-600",
-  "hackathon-winner": "bg-emerald-400",
-};
 
 export default function ProjectCard({
   project,
@@ -32,64 +25,123 @@ export default function ProjectCard({
   project: Project;
   index?: number;
 }) {
-  const { name, description, stack, status, github, demo } = project;
+  const [isExpanded, setIsExpanded] = useState(false);
+  const { title, context, description, role, tech, image, href } = project;
+  const detailsId = `project-details-${project.slug}`;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: index * 0.06, ease: "easeOut" }}
-      className="flex h-full flex-col rounded-md border border-zinc-800 bg-zinc-900/40 p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-500/50 hover:bg-zinc-900/60 hover:shadow-[0_0_24px_-10px_rgba(52,211,153,0.35)] sm:p-6"
+      className="group flex h-full flex-col overflow-hidden rounded-md border border-zinc-800 bg-zinc-900/40 transition-all duration-300 hover:border-emerald-500/50 hover:shadow-[0_0_32px_-12px_rgba(52,211,153,0.4)]"
     >
-      <div className="flex items-center gap-2">
-        <span className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[status]}`} />
-        <span className="font-mono text-[11px] uppercase tracking-wider text-zinc-500">
-          {STATUS_LABEL[status]}
+      {/* Imagem — efeito stealth por padrão, cor no hover */}
+      <div className="relative h-48 overflow-hidden bg-emerald-900/30 sm:h-56">
+        <img
+          src={image}
+          alt={title}
+          loading="lazy"
+          decoding="async"
+          className="h-full w-full object-cover grayscale opacity-70 mix-blend-luminosity transition-all duration-500 ease-out group-hover:scale-105 group-hover:opacity-100 group-hover:grayscale-0 group-hover:mix-blend-normal"
+        />
+
+        {/* Tag de contexto — some quando o overlay sobe, pra não competir com o texto */}
+        <span
+          className={`absolute left-3 top-3 rounded border border-zinc-800/80 bg-black/60 px-2 py-1 font-mono text-[10px] uppercase tracking-widest text-emerald-400 backdrop-blur-sm transition-opacity duration-300 ${
+            isExpanded ? "opacity-0" : "opacity-100"
+          }`}
+        >
+          {context}
         </span>
-      </div>
 
-      <h3 className="mt-3 text-base font-semibold text-zinc-50 sm:text-lg">
-        {name}
-      </h3>
-      <p className="mt-2 flex-1 text-sm leading-relaxed text-zinc-400">
-        {description}
-      </p>
+        {/*
+          Overlay de detalhes: absolute + inset-0 dentro do container da
+          imagem. Ele "sobe" (translate-y-full -> translate-y-0) e usa
+          overflow-y-auto, então nenhum texto — por maior que seja —
+          jamais empurra a altura do card. É isso que garante as 3
+          colunas alinhadas independente do tamanho de "O Projeto" /
+          "Meu papel" em cada projeto.
+        */}
+        <div
+          id={detailsId}
+          className={`absolute inset-0 flex flex-col gap-3 overflow-y-auto bg-zinc-950/95 p-4 backdrop-blur-sm transition-transform duration-500 ease-out sm:p-5 ${
+            isExpanded
+              ? "translate-y-0 pointer-events-auto"
+              : "translate-y-full pointer-events-none"
+          }`}
+        >
+          <div>
+            <span className="font-mono text-[10px] uppercase tracking-widest text-emerald-400">
+              O Projeto
+            </span>
+            <p className="mt-1 text-sm leading-relaxed text-zinc-300">
+              {description}
+            </p>
+          </div>
 
-      <div className="mt-5 flex flex-wrap gap-1.5">
-        {stack.map((tech) => (
-          <span
-            key={tech}
-            className="rounded border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 font-mono text-[11px] text-emerald-400"
-          >
-            {tech}
-          </span>
-        ))}
-      </div>
-
-      {(github || demo) && (
-        <div className="mt-5 flex gap-4 border-t border-zinc-800/70 pt-4 font-mono text-xs">
-          {github && (
-            <a
-              href={github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-zinc-500 transition-colors hover:text-emerald-400"
-            >
-              [ GitHub ]
-            </a>
+          {role && (
+            <div>
+              <span className="font-mono text-[10px] uppercase tracking-widest text-emerald-400">
+                Meu papel
+              </span>
+              <p className="mt-1 text-sm leading-relaxed text-zinc-300">
+                {role}
+              </p>
+            </div>
           )}
-          {demo && (
+
+          {href && (
             <a
-              href={demo}
+              href={href}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-zinc-500 transition-colors hover:text-emerald-400"
+              className="mt-auto inline-flex w-fit items-center gap-1 pt-1 font-mono text-xs text-emerald-400 underline decoration-emerald-400/40 underline-offset-4 transition-colors hover:text-emerald-300"
             >
-              [ Deploy ]
+              Ver projeto ↗
             </a>
           )}
         </div>
-      )}
+      </div>
+
+      {/* Conteúdo fixo — nunca fica escondido */}
+      <div className="flex flex-1 flex-col gap-4 p-5 sm:p-6">
+        <h3 className="text-lg font-semibold leading-snug text-zinc-50 sm:text-xl">
+          {title}
+        </h3>
+
+        <div className="mt-auto flex flex-col gap-3">
+          <button
+            type="button"
+            onClick={() => setIsExpanded((prev) => !prev)}
+            aria-expanded={isExpanded}
+            aria-controls={detailsId}
+            className="flex w-fit items-center gap-1.5 font-mono text-xs tracking-wide transition-colors duration-200"
+          >
+            <span className="text-emerald-400">{">_"}</span>
+            <span
+              className={
+                isExpanded
+                  ? "text-emerald-400"
+                  : "text-zinc-500 group-hover:text-zinc-300"
+              }
+            >
+              {isExpanded ? "FECHAR" : "VER DETALHES"}
+            </span>
+          </button>
+
+          <div className="flex flex-wrap gap-1.5">
+            {tech.map((t) => (
+              <span
+                key={t}
+                className="rounded bg-emerald-400/10 px-2 py-1 font-mono text-xs text-emerald-400"
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
     </motion.div>
   );
 }

@@ -1,12 +1,22 @@
+"use client";
+
+import { motion } from "framer-motion";
 import SectionLabel from "./ui/SectionLabel";
 
-const SKILLS = [
-  { name: "Next.js / React", level: 90 },
-  { name: "TypeScript / JavaScript", level: 88 },
-  { name: "Node.js", level: 82 },
-  { name: "Azure", level: 75 },
-  { name: "MySQL", level: 78 },
-  { name: "Postman / API testing", level: 85 },
+interface SkillItem {
+  name: string;
+  category: string;
+}
+
+// Sem níveis, sem porcentagem — a categoria é a única informação
+// estrutural que o badge precisa carregar.
+const SKILLS: SkillItem[] = [
+  { name: "Next.js / React", category: "Front-end" },
+  { name: "TypeScript / JavaScript", category: "Linguagem" },
+  { name: "Node.js", category: "Back-end" },
+  { name: "MySQL", category: "Banco de dados" },
+  { name: "Postman / API testing", category: "Testes" },
+  { name: "Azure / Vercel", category: "Cloud / Deploy" },
 ];
 
 export default function Stack() {
@@ -19,22 +29,22 @@ export default function Stack() {
           Ferramentas que uso todo dia, sem enfeite.
         </h2>
 
-        <div className="mt-12 grid gap-x-12 gap-y-8 sm:grid-cols-2">
-          {SKILLS.map((skill) => (
-            <div key={skill.name}>
-              <div className="flex items-baseline justify-between">
-                <span className="text-sm text-zinc-300">{skill.name}</span>
-                <span className="font-mono text-xs text-zinc-500">
-                  {skill.level}%
-                </span>
-              </div>
-              <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-zinc-900">
-                <div
-                  className="h-full rounded-full bg-emerald-400"
-                  style={{ width: `${skill.level}%` }}
-                />
-              </div>
-            </div>
+        <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {SKILLS.map((skill, index) => (
+            <motion.div
+              key={skill.name}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, delay: index * 0.06, ease: "easeOut" }}
+              className="group rounded-md border border-zinc-800 bg-zinc-900/50 p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-500/50 hover:bg-zinc-900/70 hover:shadow-[0_0_24px_-10px_rgba(52,211,153,0.35)]"
+            >
+              <span className="font-mono text-[11px] uppercase tracking-widest text-zinc-500 transition-colors duration-300 group-hover:text-emerald-400/80">
+                {skill.category}
+              </span>
+              <p className="mt-2 text-sm font-medium text-zinc-300">
+                {skill.name}
+              </p>
+            </motion.div>
           ))}
         </div>
       </div>
