@@ -34,22 +34,35 @@ export default function HackathonTimeline() {
           Onde a pressão de verdade me ensinou a entregar.
         </h2>
 
-        <div className="mt-12 flex flex-col divide-y divide-zinc-900">
-          {EVENTS.map((event) => (
+        {/* Trilho vertical da timeline */}
+        <div className="relative mt-16 border-l border-zinc-800 pl-8 sm:pl-10">
+          {EVENTS.map((event, index) => (
             <div
               key={event.title}
-              className="flex flex-col gap-2 py-6 sm:flex-row sm:items-baseline sm:gap-8"
+              className={`group relative ${
+                index === EVENTS.length - 1 ? "pb-0" : "pb-12"
+              }`}
             >
-              <span className="font-mono text-sm text-zinc-500 sm:w-24 sm:shrink-0">
-                {event.date}
-              </span>
-              <div>
-                <h3 className="text-base font-semibold text-zinc-50">
+              {/* Nodo — bolinha verde encaixada exatamente na linha */}
+              <span
+                className="absolute -left-[calc(2rem+7px)] top-1.5 h-3 w-3 rounded-full bg-emerald-500 ring-4 ring-zinc-950 transition-transform duration-300 group-hover:scale-125 sm:-left-[calc(2.5rem+7px)]"
+                aria-hidden="true"
+              />
+
+              {/* Card furtivo — transparente por padrão, ganha vida no hover */}
+              <div className="-mx-4 rounded-lg p-4 transition-all duration-300 hover:bg-zinc-900/30">
+                <span className="font-mono text-xs text-zinc-500">
+                  {event.date}
+                </span>
+
+                <h3 className="mt-1 text-base font-semibold text-white sm:text-lg">
                   {event.title}
                 </h3>
-                <p className="mt-1 text-sm leading-relaxed text-zinc-400">
+
+                <p className="mt-2 text-sm leading-relaxed text-zinc-400">
                   {event.detail}
                 </p>
+
                 <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1">
                   {event.tags.map((tag) => (
                     <span

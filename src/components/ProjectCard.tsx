@@ -14,7 +14,9 @@ export interface Project {
   role?: string;
   tech: string[];
   image: string;
-  /** Se presente, aparece como link dentro do overlay expandido */
+  /** Classe Tailwind de padding aplicada na <img>, controla o peso visual do logo (ex.: "p-8", "p-4") */
+  imagePaddingClass?: string;
+  /** Se presente, aparece como link ("Ver projeto ↗") dentro do overlay expandido */
   href?: string;
 }
 
@@ -26,7 +28,16 @@ export default function ProjectCard({
   index?: number;
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const { title, context, description, role, tech, image, href } = project;
+  const {
+    title,
+    context,
+    description,
+    role,
+    tech,
+    image,
+    imagePaddingClass,
+    href,
+  } = project;
   const detailsId = `project-details-${project.slug}`;
 
   return (
@@ -36,14 +47,16 @@ export default function ProjectCard({
       transition={{ duration: 0.35, delay: index * 0.06, ease: "easeOut" }}
       className="group flex h-full flex-col overflow-hidden rounded-md border border-zinc-800 bg-zinc-900/40 transition-all duration-300 hover:border-emerald-500/50 hover:shadow-[0_0_32px_-12px_rgba(52,211,153,0.4)]"
     >
-      {/* Imagem — efeito stealth por padrão, cor no hover */}
-      <div className="relative h-48 overflow-hidden bg-emerald-900/30 sm:h-56">
+      {/* Imagem — caixa travada, não encolhe nem cresce com o conteúdo do card */}
+      <div className="relative flex h-40 w-full flex-shrink-0 items-center justify-center overflow-hidden bg-zinc-900/50">
         <img
           src={image}
           alt={title}
           loading="lazy"
           decoding="async"
-          className="h-full w-full object-cover grayscale opacity-70 mix-blend-luminosity transition-all duration-500 ease-out group-hover:scale-105 group-hover:opacity-100 group-hover:grayscale-0 group-hover:mix-blend-normal"
+          className={`h-full w-full object-contain grayscale opacity-70 mix-blend-luminosity transition-all duration-500 ease-out group-hover:opacity-100 group-hover:grayscale-0 group-hover:mix-blend-normal ${
+            imagePaddingClass ?? ""
+          }`}
         />
 
         {/* Tag de contexto — some quando o overlay sobe, pra não competir com o texto */}
@@ -105,18 +118,18 @@ export default function ProjectCard({
       </div>
 
       {/* Conteúdo fixo — nunca fica escondido */}
-      <div className="flex flex-1 flex-col gap-4 p-5 sm:p-6">
-        <h3 className="text-lg font-semibold leading-snug text-zinc-50 sm:text-xl">
+      <div className="flex flex-1 flex-col gap-1 p-4">
+        <h3 className="text-base font-semibold leading-tight text-zinc-50">
           {title}
         </h3>
 
-        <div className="mt-auto flex flex-col gap-3">
+        <div className="mt-auto flex flex-col">
           <button
             type="button"
             onClick={() => setIsExpanded((prev) => !prev)}
             aria-expanded={isExpanded}
             aria-controls={detailsId}
-            className="flex w-fit items-center gap-1.5 font-mono text-xs tracking-wide transition-colors duration-200"
+            className="mb-3 mt-2 flex w-fit items-center gap-1.5 font-mono text-xs tracking-wide transition-colors duration-200"
           >
             <span className="text-emerald-400">{">_"}</span>
             <span
@@ -134,7 +147,7 @@ export default function ProjectCard({
             {tech.map((t) => (
               <span
                 key={t}
-                className="rounded bg-emerald-400/10 px-2 py-1 font-mono text-xs text-emerald-400"
+                className="rounded bg-emerald-400/10 px-1.5 py-0.5 font-mono text-[10px] text-emerald-400"
               >
                 {t}
               </span>

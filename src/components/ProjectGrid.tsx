@@ -16,8 +16,8 @@ const PROJECTS: Project[] = [
       "Manipulação de Excel (JS)",
     ],
     image: "/projeto1.png",
-    // TODO: sem link público ainda — considere linkar ao menos o
-    // repositório no GitHub pra habilitar o "Ver projeto" no overlay.
+    imagePaddingClass: "p-3",
+    href: "https://github.com/Thspli/zda", 
   },
   {
     slug: "marilan-nfc",
@@ -34,6 +34,8 @@ const PROJECTS: Project[] = [
       "Exportação (Excel/PDF)",
     ],
     image: "/projeto2.png",
+    imagePaddingClass: "p-1",
+    href: "https://github.com/Thspli/frontMarilan", 
   },
   {
     slug: "consiga-cred",
@@ -44,7 +46,8 @@ const PROJECTS: Project[] = [
     role: "Atuei como Dev Full Stack. Desenvolvi todo o CRUD e banco de dados para a área de admins e gestão de feedbacks. No Front-end, construí as páginas principais e criei diversos componentes reutilizáveis para a interface.",
     tech: ["Next.js", "Node.js", "MySQL", "Vercel", "E-mail"],
     image: "/projeto3.png",
-    href: "https://SEU-PROJETO.vercel.app", // TODO: trocar pelo link real do deploy na Vercel
+    imagePaddingClass: "p-3",
+    href: "https://consiga-cred-pompeia-front-end.vercel.app", 
   },
 ];
 
